@@ -162,8 +162,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 			'author' => '作者',
 			'search' => '搜索',
 			'feed' => 'feed',
-			'page' => '页面',
-            'resources' => '资源页（没有就不选）'
+			'page' => '页面'
 		);
 		$element = new Typecho_Widget_Helper_Form_Element_Checkbox('cache_page', $list, array('index', 'post', 'search', 'page', 'author', 'tag'), '需要缓存的页面');
         $element->setAttribute('class', 'j-setting-content j-setting-global');
@@ -320,11 +319,6 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		//action动作不缓存
 		$pattern = '#^/action#i';
 		if (preg_match($pattern, $path)) return false;
-
-
-        //resource 缓存（这个页面是我自己加的...）
-        $pattern = '#^/resources#i';
-        if (preg_match($pattern, $path) and in_array('resources', self::$plugin_config->cache_page)) return true;
 
         //fix:pjax search 失效
         $requestUrl = self::$request->getRequestUri();
