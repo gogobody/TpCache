@@ -41,8 +41,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         Typecho_Plugin::factory('Widget_Contents_Page_Edit')->finishPublish = array(__CLASS__, 'post_update');
 
         // 删除页面后更新缓存
-        Typecho_Plugin::factory('Widget_Contents_Post_Edit')->delete_100 = array(__CLASS__, 'post_del_update');
-        Typecho_Plugin::factory('Widget_Contents_Page_Edit')->delete_100 = array(__CLASS__, 'post_del_update');
+        Typecho_Plugin::factory('Widget_Contents_Post_Edit')->delete = array(__CLASS__, 'post_del_update');
+        Typecho_Plugin::factory('Widget_Contents_Page_Edit')->delete = array(__CLASS__, 'post_del_update');
 
         //评论
         Typecho_Plugin::factory('Widget_Feedback')->finishComment = array(__CLASS__, 'comment_update');
@@ -54,7 +54,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 		// 部分缓存
 		// 缓存MarkDown
-        Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx_100 = array(__CLASS__, 'cache_contentEx');
+        Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array(__CLASS__, 'cache_contentEx');
 
         // 插入写作标签
         Typecho_Plugin::factory('admin/write-post.php')->bottom_100 = array(__CLASS__, 'forTpCacheToolbar');
@@ -63,7 +63,6 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         // 插件接口
         Typecho_Plugin::factory('TpCache.Widget_Cache')->getCache = array(__CLASS__, 'TpCache_getCache');
         Typecho_Plugin::factory('TpCache.Widget_Cache')->setCache = array(__CLASS__, 'TpCache_setCache');
-
         return '插件安装成功,请设置需要缓存的页面';
 	}
 
@@ -348,8 +347,13 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
             if ($arr[1] and !empty($arr[1])){
                 // 查看文章是否是 tepass 付费文章
                 $db = Typecho_Db::get();
-                $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
-                if ($p_id) return false;
+                try {
+                    $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
+                    if ($p_id) return false;
+                }catch (Typecho_Db_Query_Exception $e){
+                    // 没有tepass
+                }
+
             }
         }
 
@@ -471,7 +475,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	    return self::$path.'_'.$cid.'_markdown';
 	}
 
-	public static function cache_contentEx($content, $obj){
+	public static function cache_contentEx($content, $obj, $lastResult){
+	    $content = empty( $lastResult ) ? $content : $lastResult;
         if (self::$plugin_config->enable_markcache == '0'){
             return $content;
         }
