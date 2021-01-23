@@ -29,5 +29,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.innerHTML = s
             }
         } else e.innerHTML = "请求失败！"
-    }), a.open("get", "https://api.github.com/repos/gogobody/TpCacheModify/releases/latest", !0), a.send(null)
+    }), a.open("get", "https://api.github.com/repos/gogobody/TpCache/releases/latest", !0), a.send(null)
 });

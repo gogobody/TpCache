@@ -60,5 +60,6 @@
 ## 如何查看缓存生效
 首先不开启缓存查看一个页面的加载时间，此刻 TTFB 为 215ms：
 ![](https://cdn.jsdelivr.net/gh/gogobody/blog-img/blogimg/20210123133349.png)
+
 同一个页面开启缓存后，TTFB 70ms
 ![](https://cdn.jsdelivr.net/gh/gogobody/blog-img/blogimg/20210123133558.png)
