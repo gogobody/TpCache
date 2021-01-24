@@ -313,14 +313,14 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 	public static function needCache($path)
 	{
-		//后台数据不缓存
+		// 后台数据不缓存
 		$pattern = '#^' . __TYPECHO_ADMIN_DIR__ . '#i';
 		if (preg_match($pattern, $path)) return false;
-		//action动作不缓存
+		// action动作不缓存
 		$pattern = '#^/action#i';
 		if (preg_match($pattern, $path)) return false;
 
-        //fix:pjax search 失效
+        // fix:pjax search 失效
         $requestUrl = self::$request->getRequestUri();
         // search 请求第一次不缓存
         $pattern = '/.*?s=.*/i';
