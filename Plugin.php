@@ -101,8 +101,9 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                     <?php require_once('Backups.php'); ?>
                 </div>
             </div>
-            <span id="j-version" style="display: none;">1.0.0</span>
+            <span id="j-version" style="display: none;">1.0.3</span>
             <div class="j-setting-notice">请求数据中...</div>
+
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
         <?
 
@@ -370,7 +371,9 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 			return;
 
 		self::initEnv();
-		if (!self::preCheck(false)) return;
+		if (self::$plugin_config->cache_driver == '0')
+			return;
+		self::$passed = true;
 
 		$type = $contents['type'];
 		$routeExists = (NULL != Typecho_Router::get($type));
@@ -388,13 +391,15 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 			->where('table.metas.type = ?', 'category')
 			->order('table.metas.order', Typecho_Db::SORT_ASC));
 		$contents['category'] = urlencode(current(Typecho_Common::arrayFlatten($contents['categories'], 'slug')));
-		$contents['slug'] = urlencode($contents['slug']);
+		$contents['slug'] = urlencode(empty($contents['slug'])?$class->slug:$contents['slug']);
 		$contents['date'] = new Typecho_Date($contents['created']);
 		$contents['year'] = $contents['date']->year;
 		$contents['month'] = $contents['date']->month;
 		$contents['day'] = $contents['date']->day;
-		
-		self::initPath(Typecho_Router::url($type, $contents));
+
+		if (!self::initPath(Typecho_Router::url($type, $contents))){
+		    throw new Typecho_Exception('初始化失败。url info:'.Typecho_Router::url($type, $contents));
+		}
 		self::delCache(self::$path);
 		// 同时，删除 markdown 的部分缓存
 		if ($class->cid)

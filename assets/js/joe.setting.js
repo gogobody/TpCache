@@ -17,15 +17,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }))
     })) : (t[0].classList.add("active"), e.style.display = "block", s.style.display = "none");
     const a = new XMLHttpRequest;
+    a.timeout = 2000;
     a.onreadystatechange = (() => {
         if (4 === a.readyState) if (a.status >= 200 && a.status < 300 || 304 === a.status) {
             let t = JSON.parse(a.responseText);
             let newest = t.tag_name;
             if (newest > n.innerHTML) {
-                let s = '<h2 class="update">检测到版本更新！</h2><p>当前版本号：' + n.innerHTML + "</p><p>最新版本号：" + newest + "</p>";
+                let s = '<h2 class="update">检测到版本更新！</h2><p>当前版本号：' + n.innerHTML + "</p><p>最新版本号：" + newest + "</p><p>更新地址：<a href='https://github.com/gogobody/TpCache'>github</a><a href='https://ijkxs.com'>博客</a></p>";
                 e.innerHTML = s
             } else {
-                let s = '<h2 class="no-update">当前已是最新版本！</h2><p>当前版本号：' + n.innerHTML + "</p><p>最新版本号：" + newest + "</p>";
+                let s = '<h2 class="no-update">当前已是最新版本！</h2><p>当前版本号：' + n.innerHTML + "</p><p>最新版本号：" + newest + "</p><p>更新地址：<a href='https://github.com/gogobody/TpCache'>github</a><a href='https://ijkxs.com'>博客</a></p>";
                 e.innerHTML = s
             }
         } else e.innerHTML = "请求失败！"
