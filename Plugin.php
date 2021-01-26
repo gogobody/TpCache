@@ -101,7 +101,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                     <?php require_once('Backups.php'); ?>
                 </div>
             </div>
-            <span id="j-version" style="display: none;">1.0.3</span>
+            <span id="j-version" style="display: none;">1.0.4</span>
             <div class="j-setting-notice">请求数据中...</div>
 
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
@@ -398,7 +398,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		$contents['day'] = $contents['date']->day;
 
 		if (!self::initPath(Typecho_Router::url($type, $contents))){
-		    throw new Typecho_Exception('初始化失败。url info:'.Typecho_Router::url($type, $contents));
+		    return;
+//		    throw new Typecho_Exception('初始化失败。url info:'.Typecho_Router::url($type, $contents));
 		}
 		self::delCache(self::$path);
 		// 同时，删除 markdown 的部分缓存
