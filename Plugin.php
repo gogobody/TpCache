@@ -18,7 +18,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	public static $sys_config = null;
 	public static $plugin_config = null;
 	public static $request = null;
-	
+
 	public static $passed = false;
 
 	/**
@@ -46,7 +46,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
         //评论
         Typecho_Plugin::factory('Widget_Feedback')->finishComment = array(__CLASS__, 'comment_update');
-		
+
 		//评论后台
 		Typecho_Plugin::factory('Widget_Comments_Edit')->finishDelete = array(__CLASS__, 'comment_update2');
 		Typecho_Plugin::factory('Widget_Comments_Edit')->finishEdit = array(__CLASS__, 'comment_update2');
@@ -343,8 +343,12 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                 // 查看文章是否是 tepass 付费文章
                 $db = Typecho_Db::get();
                 try {
-                    $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
-                    if ($p_id) return false;
+                    $tepass_exist = $db->fetchRow($db->select()->from('information_schema.TABLES')->where('TABLE_NAME = ?',$db->getPrefix().'tepass_posts'));
+                    if (isset($tepass_exist) and count($tepass_exist) > 0){
+                          $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
+                          if ($p_id) return false;
+                    }
+
                 }catch (Typecho_Db_Query_Exception $e){
                     // 没有tepass
                 }
@@ -448,7 +452,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		if ($comment->cid)
 		    self::delCache(self::getPostMarkCacheName($comment->cid));
 	}
- 
+
 	public static function comment_update2($comment, $edit)
 	{
 		self::initEnv();
