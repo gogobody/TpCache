@@ -2,11 +2,11 @@
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 /**
- * Typecho缓存插件
+ * Typecho缓存插件 ， 例如：redis 缓存需要装 redis以及php里需要启用redis扩展
  *
  * @package TpCache
  * @author gogobody
- * @version 1.0.0
+ * @version 1.0.5
  * @link https://www.ijkxs.com
  */
 
@@ -101,7 +101,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                     <?php require_once('Backups.php'); ?>
                 </div>
             </div>
-            <span id="j-version" style="display: none;">1.0.4</span>
+            <span id="j-version" style="display: none;">1.0.5</span>
             <div class="j-setting-notice">请求数据中...</div>
 
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
