@@ -5,9 +5,9 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * Typecho缓存插件
  *
  * @package TpCache
- * @author gogobody modify
+ * @author gogobody
  * @version 1.0.0
- * @link https://ijkxs.com
+ * @link https://www.ijkxs.com
  */
 
 class TpCache_Plugin implements Typecho_Plugin_Interface
@@ -449,7 +449,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		    self::delCache(self::getPostMarkCacheName($comment->cid));
 	}
  
-	public static function comment_update2($comment = null, $edit)
+	public static function comment_update2($comment, $edit)
 	{
 		self::initEnv();
 		self::preCheck(false);
