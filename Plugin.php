@@ -343,7 +343,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                 // 查看文章是否是 tepass 付费文章
                 $db = Typecho_Db::get();
                 try {
-                    $tepass_exist = $db->fetchRow($db->select()->from('information_schema.TABLES')->where('TABLE_NAME = ?',$db->getPrefix().'tepass_posts'));
+		    $database = $db->getConfig($db::READ)['database'];
+                    $tepass_exist = $db->fetchRow($db->select()->from('information_schema.TABLES')->where('TABLE_NAME = ?',$db->getPrefix().'tepass_posts')->where('TABLE_SCHEMA = ?',$database));
                     if (isset($tepass_exist) and count($tepass_exist) > 0){
                           $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
                           if ($p_id) return false;
