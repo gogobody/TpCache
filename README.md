@@ -6,6 +6,10 @@
 
 原插件地址: https://github.com/phpgao/TpCache
 
+
+## 修复日志
+修复了一些异常报错、兼容多个版本，没有功能更新
+
 ## 说明
 Tepass 说明：需要先启动本插件，在启动tepass 插件，否则 tepass 文章内付费会被缓存而失效。  
 插件适配了 Tepass ，默认不会对 Tepass 付费文章缓存。  
