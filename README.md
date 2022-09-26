@@ -9,9 +9,9 @@
 
 
 ## 修复日志
-[@Suroy](https://github.com/zsuroy/TpCache)
-修复了一些异常报错、兼容多个版本，没有功能更新
-修复直接IP显示各级永久链接，更换为域名显示
+[@Suroy](https://github.com/zsuroy/TpCache)  
+修复了一些异常报错、兼容多个版本，没有功能更新  
+修复直接IP显示各级永久链接，更换为域名显示  
 
 ## 说明
 Tepass 说明：需要先启动本插件，在启动tepass 插件，否则 tepass 文章内付费会被缓存而失效。  
