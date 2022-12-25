@@ -105,7 +105,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
             <div class="j-setting-notice">请求数据中...</div>
 
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
-        <?
+        <?php
 
         $list = array('关闭', '开启');
 		$element = new Typecho_Widget_Helper_Form_Element_Radio('login', $list, 1, '是否对已登录用户失效', '已经录用户不会触发缓存策略');
@@ -212,9 +212,11 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		self::initEnv();
 		if (!self::preCheck()) return;
 		if (!self::initPath()) return;
+		
 		// 全局缓存关闭则直接返回
 		if (self::$plugin_config->enable_gcache == '0')
 		    return ;
+		    
 		try {
 			// 获取当前url的缓存
 			$data = self::getCache();
@@ -224,10 +226,14 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 					self::$passed = false;
 				// 缓存命中 // 这里是我个人用来控制 主题黑夜模式的...
 				$html = str_replace('{colorMode}',$_COOKIE['night']=='1'?'dark':'light',$data['html']);
+				header("TpCache: HIT");
 				echo $html;
 				die;
+			} else {
+			    header("TpCache: MISS");
 			}
 		} catch (Exception $e) {
+		    header("TpCache: ERROR");
 			echo $e->getMessage();
 		}
 		// 先进行一次刷新
@@ -358,7 +364,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         }
 
 		foreach ($_routingTable[0] as $page => $route) {
-			if ($route['widget'] != 'Widget_Archive') continue;
+			if ($route['widget'] != 'Widget_Archive' && $route['widget'] != '\Widget\Archive') continue;
 			if (preg_match($route['regx'], $path)) {
 				$exclude = array('_year', '_month', '_day', '_page');
 				$page = str_replace($exclude, '', $page);
