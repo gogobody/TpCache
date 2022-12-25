@@ -105,7 +105,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
             <div class="j-setting-notice">请求数据中...</div>
 
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
-        <?
+        <?php
 
         $list = array('关闭', '开启');
 		$element = new Typecho_Widget_Helper_Form_Element_Radio('login', $list, 1, '是否对已登录用户失效', '已经录用户不会触发缓存策略');
