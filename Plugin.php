@@ -109,7 +109,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
             <script src="<?php echo Helper::options()->rootUrl ?>/usr/plugins/TpCache/assets/js/joe.setting.min.js"></script>
         <?php
-		//@Suroy fixed
+
         $list = array('关闭', '开启');
 		$element = new Typecho_Widget_Helper_Form_Element_Radio('login', $list, 1, '是否对已登录用户失效', '已经录用户不会触发缓存策略');
         $element->setAttribute('class', 'j-setting-content j-setting-config');
@@ -222,9 +222,11 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		self::initEnv();
 		if (!self::preCheck()) return;
 		if (!self::initPath()) return;
+		
 		// 全局缓存关闭则直接返回
 		if (self::$plugin_config->enable_gcache == '0')
 		    return ;
+		    
 		try {
 			// 获取当前url的缓存
 			$data = self::getCache();
@@ -232,15 +234,22 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 				//缓存未过期, 跳过之后的缓存重写入
 				if ($data['time'] + self::$plugin_config->expire < time())
 					self::$passed = false;
+
 				// 缓存命中 // 这里是我个人用来控制 主题黑夜模式的... | 加入判断逻辑以适配不同主题
 				$html = str_replace('{colorMode}',(isset($_COOKIE['night']) && ($_COOKIE['night']) =='1')?'dark':'light',$data['html']);
 				$domain = explode('|', self::$plugin_config->domain);
 				$html = str_replace($domain[0], $domain[1], $html); //修正全站域名错误
 				// if(isset($_GET['debug'])){print_r(Helper::options()->siteurl());print_r($data);}
+
+				header("TpCache: HIT");
+
 				echo $html;
 				die;
+			} else {
+			    header("TpCache: MISS");
 			}
 		} catch (Exception $e) {
+		    header("TpCache: ERROR");
 			echo $e->getMessage();
 		}
 		// 先进行一次刷新
@@ -308,7 +317,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	public static function initPath($pathInfo='')
 	{
 		if(empty($pathInfo))
-			$pathInfo = self::$request->getPathInfo();
+			$pathInfo = self::$request->getInstance()->getPathInfo();
 
 		if (!self::needCache($pathInfo)) return false;
 		self::$path = $pathInfo;
@@ -372,7 +381,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         }
 
 		foreach ($_routingTable[0] as $page => $route) {
-			if ($route['widget'] != 'Widget_Archive') continue;
+			if ($route['widget'] != 'Widget_Archive' && $route['widget'] != '\Widget\Archive') continue;
 			if (preg_match($route['regx'], $path)) {
 				$exclude = array('_year', '_month', '_day', '_page');
 				$page = str_replace($exclude, '', $page);
@@ -458,7 +467,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 			return;
 
 		// 获取评论的PATH_INFO
-		$path_info = self::$request->getPathInfo();
+		$path_info = self::$request->getInstance()->getPathInfo();
 		// 删除最后的 /comment就是需删除的path
 		$article_url = preg_replace('/\/comment$/i','',$path_info);
 
@@ -490,7 +499,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	// 缓存content
 	public static function getPostMarkCacheName($cid){
 	    if (!self::$path)
-	        self::$path = self::$request->getPathInfo();
+	        self::$path = self::$request->getInstance()->getPathInfo();
 	    return self::$path.'_'.$cid.'_markdown';
 	}
 
@@ -503,7 +512,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         if (substr_count($content,'<!--no-cache-->'))
             return $content;
         // 为 content 设置特殊的 cache name
-        self::$path = self::$request->getPathInfo();
+        self::$path = self::$request->getInstance()->getPathInfo();
         $cacheName = self::getPostMarkCacheName($obj->cid);
         self::initEnv();
         if (!self::preCheck(false)) {
