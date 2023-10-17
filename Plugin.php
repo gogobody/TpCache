@@ -5,10 +5,13 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * Typecho缓存插件 ， 例如：redis 缓存需要装 redis以及php里需要启用redis扩展
  *
  * @package TpCache
- * @author gogobody
+ * @author Suroy,gogobody
  * @version 1.0.5
  * @link https://www.ijkxs.com
+ * @fixed @zsuroy(Suroy.cn)
+ * @note 修复报错/兼容不同版本主题
  */
+
 
 class TpCache_Plugin implements Typecho_Plugin_Interface
 {
@@ -141,6 +144,12 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		//$list = array('关闭', '开启');
 		//$element = new Typecho_Widget_Helper_Form_Element_Radio('is_debug', $list, 0, '是否开启debug');
 		//$form->addInput($element);
+		
+		// 域名修正
+		$fixDomain = $_SERVER['SERVER_ADDR'].'|'.$_SERVER['SERVER_NAME'];
+		$element = new Typecho_Widget_Helper_Form_Element_Text('domain', null , (string)$fixDomain, '域名地址修正', '将直接服务器IP地址输出修正为域名输出');
+		$element->setAttribute('class', 'j-setting-content j-setting-config');
+		$form->addInput($element);
 
 		$list = array('关闭', '清除所有数据');
 		$element = new Typecho_Widget_Helper_Form_Element_Radio('is_clean', $list, 0, '清除所有数据');
@@ -180,6 +189,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 	public static function personalConfig(Typecho_Widget_Helper_Form $form) {}
 
+	
 	public static function configHandle($config, $is_init)
 	{
 		if ($config['cache_driver'] != '0') {
@@ -224,9 +234,15 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 				//缓存未过期, 跳过之后的缓存重写入
 				if ($data['time'] + self::$plugin_config->expire < time())
 					self::$passed = false;
-				// 缓存命中 // 这里是我个人用来控制 主题黑夜模式的...
-				$html = str_replace('{colorMode}',$_COOKIE['night']=='1'?'dark':'light',$data['html']);
+
+				// 缓存命中 // 这里是我个人用来控制 主题黑夜模式的... | 加入判断逻辑以适配不同主题
+				$html = str_replace('{colorMode}',(isset($_COOKIE['night']) && ($_COOKIE['night']) =='1')?'dark':'light',$data['html']);
+				$domain = explode('|', self::$plugin_config->domain);
+				$html = str_replace($domain[0], $domain[1], $html); //修正全站域名错误
+				// if(isset($_GET['debug'])){print_r(Helper::options()->siteurl());print_r($data);}
+
 				header("TpCache: HIT");
+
 				echo $html;
 				die;
 			} else {
@@ -349,7 +365,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
                 // 查看文章是否是 tepass 付费文章
                 $db = Typecho_Db::get();
                 try {
-		    $database = $db->getConfig($db::READ)['database'];
+					// fix: 版本不同导致读取数据库名错误 @zsuroy
+		    $database = isset($db->getConfig($db::READ)['database']) ? $db->getConfig($db::READ)['database'] : $db->getConfig($db::READ)[0]->database;
                     $tepass_exist = $db->fetchRow($db->select()->from('information_schema.TABLES')->where('TABLE_NAME = ?',$db->getPrefix().'tepass_posts')->where('TABLE_SCHEMA = ?',$database));
                     if (isset($tepass_exist) and count($tepass_exist) > 0){
                           $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
