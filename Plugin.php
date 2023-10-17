@@ -301,7 +301,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	public static function initPath($pathInfo='')
 	{
 		if(empty($pathInfo))
-			$pathInfo = self::$request->getPathInfo();
+			$pathInfo = self::$request->getInstance()->getPathInfo();
 
 		if (!self::needCache($pathInfo)) return false;
 		self::$path = $pathInfo;
@@ -450,7 +450,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 			return;
 
 		// 获取评论的PATH_INFO
-		$path_info = self::$request->getPathInfo();
+		$path_info = self::$request->getInstance()->getPathInfo();
 		// 删除最后的 /comment就是需删除的path
 		$article_url = preg_replace('/\/comment$/i','',$path_info);
 
@@ -482,7 +482,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	// 缓存content
 	public static function getPostMarkCacheName($cid){
 	    if (!self::$path)
-	        self::$path = self::$request->getPathInfo();
+	        self::$path = self::$request->getInstance()->getPathInfo();
 	    return self::$path.'_'.$cid.'_markdown';
 	}
 
@@ -495,7 +495,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
         if (substr_count($content,'<!--no-cache-->'))
             return $content;
         // 为 content 设置特殊的 cache name
-        self::$path = self::$request->getPathInfo();
+        self::$path = self::$request->getInstance()->getPathInfo();
         $cacheName = self::getPostMarkCacheName($obj->cid);
         self::initEnv();
         if (!self::preCheck(false)) {
