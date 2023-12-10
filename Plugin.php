@@ -237,6 +237,8 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 				// 缓存命中 // 这里是我个人用来控制 主题黑夜模式的... | 加入判断逻辑以适配不同主题
 				$html = str_replace('{colorMode}',(isset($_COOKIE['night']) && ($_COOKIE['night']) =='1')?'dark':'light',$data['html']);
+				$html = str_replace('<!--cache tag-->','<!--cache open-->',$data['html']);
+				
 				$domain = explode('|', self::$plugin_config->domain);
 				$html = str_replace($domain[0], $domain[1], $html); //修正全站域名错误
 				// if(isset($_GET['debug'])){print_r(Helper::options()->siteurl());print_r($data);}
@@ -336,6 +338,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 	public static function needCache($path)
 	{
+	    if($_REQUEST['api']) return false;
 		// 后台数据不缓存
 		$pattern = '#^' . __TYPECHO_ADMIN_DIR__ . '#i';
 		if (preg_match($pattern, $path)) return false;
