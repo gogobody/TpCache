@@ -337,10 +337,6 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 	public static function needCache($path)
 	{
 	    if(isset($_REQUEST['api'])) return false;
-	    // 用户中心插件不缓存
-		$pattern = '#^/ucenter#i';
-		if (preg_match($pattern, $path)) return false;
-		
 		// 后台数据不缓存
 		$pattern = '#^' . __TYPECHO_ADMIN_DIR__ . '#i';
 		if (preg_match($pattern, $path)) return false;
