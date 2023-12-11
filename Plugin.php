@@ -6,10 +6,8 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  *
  * @package TpCache
  * @author Suroy,gogobody
- * @version 1.0.5
+ * @version 1.0.6
  * @link https://www.ijkxs.com
- * @fixed @zsuroy(Suroy.cn)
- * @note 修复报错/兼容不同版本主题
  */
 
 
@@ -338,7 +336,11 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 
 	public static function needCache($path)
 	{
-	    if($_REQUEST['api']) return false;
+	    if(isset($_REQUEST['api'])) return false;
+	    // 用户中心插件不缓存
+		$pattern = '#^/ucenter#i';
+		if (preg_match($pattern, $path)) return false;
+		
 		// 后台数据不缓存
 		$pattern = '#^' . __TYPECHO_ADMIN_DIR__ . '#i';
 		if (preg_match($pattern, $path)) return false;
@@ -372,7 +374,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		    $database = isset($db->getConfig($db::READ)['database']) ? $db->getConfig($db::READ)['database'] : $db->getConfig($db::READ)[0]->database;
                     $tepass_exist = $db->fetchRow($db->select()->from('information_schema.TABLES')->where('TABLE_NAME = ?',$db->getPrefix().'tepass_posts')->where('TABLE_SCHEMA = ?',$database));
                     if (isset($tepass_exist) and count($tepass_exist) > 0){
-                          $p_id = $db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
+                          $p_id = @$db->fetchObject($db->select('id')->from('table.tepass_posts')->where('post_id = ?',$arr[1]))->id;
                           if ($p_id) return false;
                     }
 
