@@ -35,11 +35,14 @@ class typecho_memcached implements TpCache
 		}
 	}
 
-	public function add($key, $value)
-	{
-		return $this->mc->set($key, $value, $this->expire);
-	}
+    public function add($key, $value)
+    {
+        // 将当前请求的协议作为一部分加入缓存键中
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $key = $protocol . '_' . $key;
 
+        return $this->mc->set($key, $value, $this->expire);
+    }
 	public function delete($key)
 	{
 		return $this->mc->delete($key);
