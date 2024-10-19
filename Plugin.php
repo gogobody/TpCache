@@ -484,7 +484,7 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		self::preCheck(false);
 		self::initBackend(self::$plugin_config->cache_driver);
 
-		$perm = stripslashes($edit->parentContent['permalink']);
+		$perm = stripslashes($edit->parentContent->permalink);
 		$perm = preg_replace('/(https?):\/\//', '', $perm);
 		$perm = preg_replace('/'.$_SERVER['HTTP_HOST'].'/', '', $perm);
 
