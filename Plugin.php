@@ -144,7 +144,10 @@ class TpCache_Plugin implements Typecho_Plugin_Interface
 		//$form->addInput($element);
 		
 		// 域名修正
-		$fixDomain = $_SERVER['SERVER_ADDR'].'|'.$_SERVER['SERVER_NAME'];
+		$server_addr = $_SERVER['SERVER_ADDR'] ?? '127.0.0.1'; // 默认本地回环地址
+		// 或使用空合并运算符（PHP 7+）
+                $server_name = $_SERVER['SERVER_NAME'] ?? 'localhost';
+		$fixDomain = $server_addr.'|'.$server_name;
 		$element = new Typecho_Widget_Helper_Form_Element_Text('domain', null , (string)$fixDomain, '域名地址修正', '将直接服务器IP地址输出修正为域名输出');
 		$element->setAttribute('class', 'j-setting-content j-setting-config');
 		$form->addInput($element);
